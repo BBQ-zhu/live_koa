@@ -4,11 +4,11 @@
       <view class="content">
         <view class="listDetail">
           <label>企业名称：</label>
-          <input v-model="listDetail.company_name" class="uni-input" placeholder="请输入企业名称" />
+          <input :disabled="!uniId" v-model="listDetail.company_name" class="uni-input" placeholder="请输入企业名称" />
         </view>
         <view class="listDetail">
           <label>活动地点：</label>
-          <input v-model="listDetail.active_place" class="uni-input" placeholder="请输入活动地点" />
+          <input :disabled="!uniId" v-model="listDetail.active_place" class="uni-input" placeholder="请输入活动地点" />
         </view>
         <view class="listDetail">
           <label>活动时间：</label>
@@ -22,6 +22,7 @@
 
         <label style="font-weight: 600;">备注信息：</label>
         <textarea
+		  :disabled="!uniId"
           rows="3"
           v-model="listDetail.remarks"
           auto-height
@@ -33,9 +34,9 @@
 
     <view style="background-color: #FFFFFF">
       <button
-	  v-if="!changeShow"
+		v-if="!changeShow"
         size="mini"
-        @click="changeShow = true"
+        @click="changeBtn()"
         class="newBgColor blackColor"
         style="float:right;margin: 8px 10px 5px 0px;"
       >编辑</button>
@@ -90,8 +91,8 @@
               type="number"
               placeholder="数量"
             />
-            <view class="controlDevies">
-              <view class="Devies" @click="delateDevice(ite.devices_two_id,index,ind)">-</view>
+            <view class="controlDevies" >
+              <view v-if="uniId" class="Devies" @click="delateDevice(ite.devices_two_id,index,ind)">-</view>
             </view>
           </view>
         </uni-collapse-item>
@@ -160,11 +161,11 @@ export default {
       maxCount: 10,
       imgList: [],
       imgListId: [],
-      listDetail: {}
+      listDetail: {},
+	  uniId:false
     };
   },
   onLoad(option) {
-    console.log(option);
     if (option) {
       this.listDetail = JSON.parse(option.data);
       this.listDetail.task_medium_tables =
@@ -176,10 +177,22 @@ export default {
         this.imgListId.push(imgArr[i].id);
       }
     }
-    console.log(this.listDetail);
+	var login = uni.getStorageSync('uniId')
+	if(this.$superBoss.username == login.username && this.$superBoss.password == login.password){
+		this.uniId = true
+	}else{
+		this.uniId = false
+	}
+	
   },
-
   methods: {
+	  changeBtn(){
+		if(!this.uniId){
+			uni.showToast({ title: "暂无权限。。。", icon: "none", duration: 2000 }); //弹出框
+			return
+		}
+		this.changeShow = true
+	  },
     // uni.showModal({
     //   title: "提示",
     //   content: "这是一个模态弹窗",
@@ -298,7 +311,6 @@ export default {
     //设备选择事件后新增
     deviceChange(value) {
       var valueList = value.item;
-
       var arr1 = {
         task_id: this.listDetail.id,
         device_name: valueList[1].device_name,
@@ -323,7 +335,6 @@ export default {
           }
         ]
       };
-
       //添加二级设备
       this.$myAjax("/createTask/devices_two", arr1).then(res => {
         console.log(res);
@@ -360,7 +371,6 @@ export default {
             let arr2 = { device_name: "", devices_id: "", devices_twos: [] };
             arr2.device_name = val.device_name;
             arr2.devices_id = val.id;
-
             let numList = [];
             for (let i = 1; i < 51; i++) {
               let arr3 = { device_name: "", devices_id: "" };
@@ -385,7 +395,6 @@ export default {
     uploadImg() {
       this.$refs.gUpload.uploadImg();
     },
-
     chooseFile(list, v) {
       console.log(this.imgList);
       console.log(list, v);
@@ -431,24 +440,20 @@ export default {
             if (JSON.parse(res.data).data.code == 200) {
               this.findThisIdImg();
             }
-
             // console.log(this.imgList);
           }
         });
       }
     },
-
     // 删除图片
     imgDelete(list, eq) {
       console.log(list, eq);
-
       var imgArr = JSON.parse(JSON.stringify(this.listDetail.upload_imgs));
       console.log(imgArr[eq]);
       var arr = {
         fileName: imgArr[eq].img_url,
         img_id: imgArr[eq].id
       };
-
       this.$myAjax("/delateImg", arr).then(res => {
         console.log(res);
         if (res.code == 200) {
@@ -458,7 +463,6 @@ export default {
         // this.imgListId.splice(eq,1)
       });
     },
-
     //查询当前任务的价格
     checkPrice() {
       var arr = this.listDetail.task_medium_tables;
@@ -510,7 +514,6 @@ export default {
   margin-top: 6px;
   margin-left: 4px;
 }
-
 .save {
   width: 100px;
   height: 40px;
