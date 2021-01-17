@@ -12,7 +12,7 @@
 				 :data-id="item.id">
 					{{item.device_name}}
 				</view>
-				<view class="cu-item">
+				<view class="cu-item" v-if="uniId">
 					<button @click="createdev(1,null)" style="margin-top:10px;margin-right:5px;" size="mini" class=" newBgColor blackColor">
 						增加
 					</button>
@@ -26,20 +26,20 @@
 							<text class="cuIcon-title text-green"></text> {{item.device_name}}
 							
 						</view>
-						<view class="action">
+						<view class="action" v-if="uniId">
 							<view class="Devies" @click="delatedev(1,item)"> - </view>
 							<view class="ml10 Devies" @click="createdev(2,item)"> + </view>
 						</view>
 					</view>
 					<view class="cu-list menu-avatar" >
-						<view class="cu-item " @click="delatedev(2,val)" v-for="(val,ind) in item.devices_twos" :key="val.id" >
+						<view class="cu-item " @click="uniId && delatedev(2,val)" v-for="(val,ind) in item.devices_twos" :key="val.id" >
 							<view class="cu-avatar round lg" :style="MathRandomImg(ind)"></view>
 							<view class="content">
 								<view><text class="text-cut">{{val.device_name}}</text></view>
 								<view class="text-gray text-sm flex"> <text class="text-cut">{{val.updatedAt.split('T')[0]}}</text></view>
 							</view>
 							<view class="action">
-								<view class="text-grey text-xs">￥:{{val.device_price}}</view>
+								<view class="text-grey text-xs" v-if="uniId">￥:{{val.device_price}}</view>
 								<view class="cu-tag round bg-red sm">{{val.devices_number}}</view>
 							</view>
 						</view>
@@ -87,7 +87,8 @@
 				tabCur: 0,
 				mainCur: 0,
 				verticalNavTop: 0,
-				load: true
+				load: true,
+				uniId:false
 			};
 		},
 		onLoad() {
@@ -96,12 +97,17 @@
 			this.tabMask = new TabMask({opacity:0.6})
 			this.tabMask.show(300)
 			this.tabMask.hide()
+			var login = uni.getStorageSync('uniId')
+			if(this.$superBoss.username == login.username && this.$superBoss.password == login.password){
+				this.uniId = true
+			}else{
+				this.uniId = false
+			}
 		},
 		onReady() {
 			uni.hideLoading()
 		},
 		methods: {
-			
 			delatedev(lev,val){ //删除设备
 				this.CorD = 'delate'
 				this.modalValue = true
@@ -147,8 +153,9 @@
 					this.inputData = {
 					  title:'二级类目',
 					  content:[
-					  {title:'名称:',content:'',type:'text',placeholder:'请输入二级类目名称'},
-					  {title:'价格:',content:'',type:'number',placeholder:'请输入二级类目价格'}
+					  {title:'名称:',content:'',type:'text',placeholder:'请输入名称'},
+					  {title:'价格:',content:'',type:'number',placeholder:'请输入价格'},
+					  {title:'数量:',content:'',type:'number',placeholder:'请输入数量'}
 					  ]
 					}
 				}
@@ -192,6 +199,7 @@
 						devices_id: this.devId, //一级设备id
 						device_name: val[0].content,
 						device_price: parseInt(val[1].content),
+						devices_number: parseInt(val[2].content),
 					}
 				}
 				this.$myAjax('/createdevices', arr, ).then(res => {
@@ -228,7 +236,6 @@
 					console.log(res.data)
 				})
 			},
-
 			TabSelect(e) {
 				this.tabCur = e.currentTarget.dataset.id;
 				this.mainCur = e.currentTarget.dataset.id;
