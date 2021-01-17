@@ -50,22 +50,22 @@ export default {
       imgList: [
         {
           url:
-            "https://img9.51tietu.net/pic/2019-091200/vgkpidei2tjvgkpidei2tj.jpg",
+            "https://ossweb-img.qq.com/images/lol/web201310/skin/big39001.jpg",
           id: 1
         },
         {
           url:
-            "https://img9.51tietu.net/pic/2019-091200/euzekmi5m23euzekmi5m23.jpg",
+            "https://ossweb-img.qq.com/images/lol/web201310/skin/big39005.jpg",
           id: 2
         },
         {
           url:
-            "https://img9.51tietu.net/pic/2019-091200/143tt0ta4sr143tt0ta4sr.jpg",
+            "https://ossweb-img.qq.com/images/lol/web201310/skin/big39003.jpg",
           id: 3
         },
         {
           url:
-            "https://img9.51tietu.net/pic/2019-091200/ff1vqwm3q33ff1vqwm3q33.jpg",
+            "https://ossweb-img.qq.com/images/lol/web201310/skin/big39004.jpg",
           id: 4
         }
       ]
@@ -83,6 +83,7 @@ export default {
     }, 1500);
   },
   onShow() {
+	  console.log('这里是首页')
     this.limit = 5;
     this.offset = 0;
     this.allTaskList = []; //所有任务
@@ -90,7 +91,6 @@ export default {
     this.allTask2();
     // this.allUser()
   },
-
   onReachBottom() {
     // 触底的时候请求数据，即为上拉加载更多
     this.allTask();
@@ -142,7 +142,6 @@ export default {
         console.log(res);
       });
     },
-
     //查询所有任务 分页
     allTask() {
       let arr = {
