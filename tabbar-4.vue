@@ -77,7 +77,8 @@
 				company_name: '',
 				active_place: '',
 				allTaskList2: [],
-				deviesList:[]
+				deviesList:[],
+				uniId:false
 			}
 		},
 		onLoad() {
@@ -86,10 +87,20 @@
 			this.allTaskList = [] //所有任务
 			this.allTask()
 			this.findAllDevices() //查询所有设备
+			
+			var login = uni.getStorageSync('uniId')
+			if(this.$superBoss.username == login.username && this.$superBoss.password == login.password){
+				this.uniId = true
+			}else{
+				this.uniId = false
+			}
 		},
-
 		methods: {
 			downLoadTasks() { //下载
+			if(!this.uniId){
+				uni.showToast({ title: "暂无权限。。。", icon: "none", duration: 2000 }); //弹出框
+				return
+			}
 				let arr = {
 					statistics: "2", //是否是统计界面(0:首页分页查询,1:统计页多条件查询,2:下载excel)
 					limit: this.limit,
@@ -175,7 +186,6 @@
 									allMini +=
 										 value.device_name + "x" + value.devices_two_num+'、' ;
 								}
-
 								dataJson["deviceId_" + val.devices_one_id] =
 									"共" + allValue + "平方" +'('+allMini+')';
 							} else {
@@ -207,14 +217,12 @@
 					}
 					headerName = headerName + "\n";
 				}
-
 				if ("download" in document.createElement("a")) {
 					// 非IE下载
 					var blob = new Blob([headerName], {
 						//解决中文乱码问题
 						type: "text/plain;charset=utf-8"
 					});
-
 					blob = new Blob([String.fromCharCode(0xfeff), blob], {
 						type: blob.type
 					});
@@ -228,12 +236,10 @@
 					document.body.removeChild(link);
 				} else {
 					// IE10+下载
-
 					let blob = new Blob([headerName], {
 						//解决中文乱码问题
 						type: "text/plain;charset=utf-8"
 					});
-
 					blob = new Blob([String.fromCharCode(0xfeff), blob], {
 						type: blob.type
 					});
@@ -282,7 +288,6 @@
 				this.$refs.modal.hideModal()
 			},
 			onConfirm() { //确认
-
 			},
 			//时间控件
 			changeStart(e) {
@@ -304,14 +309,12 @@
 		background-color: #333333;
 		/* background-color:rgb(255, 162, 0); */
 	}
-
 	.nav-bottom {
 		width: 100%;
 		position: flex;
 		align-items: center;
 		justify-content: space-between;
 	}
-
 	.nav_text {
 		width: 40px;
 		height: 40px;
@@ -323,7 +326,6 @@
 		/* border-radius: 10px; */
 		/* background-color: #007AFF; */
 	}
-
 	.nav-input {
 		float: left;
 		width: 70%;
@@ -334,32 +336,26 @@
 		color: rgb(255, 162, 0);
 		/* color:#d81e06; */
 	}
-
 	.save {
 		width: 100px;
 		height: 40px;
 		line-height: 38px;
 		text-align: center;
 	}
-
 	.content {
 		width: 98%;
 		margin: 0 auto;
 		margin: 10px 0 0 20px;
-
 	}
-
 	.listDetail {
 		display: flex;
 		justify-content: left;
 		align-items: center;
 		width: 100%;
 	}
-
 	.listDetail>label {
 		font-weight: 600;
 	}
-
 	.uni-input {
 		width: 70%
 	}
