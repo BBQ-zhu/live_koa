@@ -27,10 +27,18 @@
 export default {
 	data() {
 		return {
-			active: false
+			active: false,
+			uniId:false
 		};
 	},
-	onLoad() {},
+	onLoad() {
+		var login = uni.getStorageSync('uniId')
+		if(this.$superBoss.username == login.username && this.$superBoss.password == login.password){
+			this.uniId = true
+		}else{
+			this.uniId = false
+		}
+	},
 	onShow() {
 		// setTimeout(() => {
 		this.active = true;
@@ -44,6 +52,10 @@ export default {
 			uni.showToast({ title: "开发中。。。", icon: "none", duration: 2000 }); //弹出框
 		},
 		goToPage(url) {
+			if(!this.uniId){
+				uni.showToast({ title: "暂无权限。。。", icon: "none", duration: 2000 }); //弹出框
+				return
+			}
 			var arr = {
 				active_all_price: 0,
 				active_place: '活动地点',
@@ -59,12 +71,7 @@ export default {
 				});
 				}
 			})
-			
-			// if (!url) return;
-			// uni.navigateTo({
-			// 	url
-			// });
-			
+
 		}
 	}
 };
