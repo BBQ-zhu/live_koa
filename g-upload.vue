@@ -3,10 +3,10 @@
     <view :class="['imglistItem',columnNum==3?'column3':'column4']" v-for="(item,index) in showList" :key='index'>
       <!-- <view :style="{width:'100%;',height:'auto;',background:url()}"></view> -->
       <image :src="item" class="itemImg_zhu" @click="previewImage(index)" mode="aspectFill"></image>
-      <icon size="18" type="cancel" class="cancelBtn" @click="deleteImg(index)" v-if="deleteBtn"></icon>
+      <icon size="18" type="cancel" class="cancelBtn" @click="deleteImg(index)" v-if="uniId && deleteBtn"></icon>
     </view>
     <!-- 上传控件 -->
-    <view :class="['imglistItem',columnNum==3?'column3':'column4']" @click="uploadImg" v-if="control && showControl">
+    <view :class="['imglistItem',columnNum==3?'column3':'column4']" @click="uploadImg" v-if="uniId && control && showControl">
       <view class="itemImg uploadControl">+</view>
     </view>
     <view class="clear"></view>
@@ -48,7 +48,8 @@
       return {
         imgList: [],
         showList: [],
-        showControl: true
+        showControl: true,
+		uniId:false
       }
     },
     watch: {
@@ -66,6 +67,12 @@
     },
     created() {
       this.init(this.mode)
+	  var login = uni.getStorageSync('uniId')
+	  if(this.$superBoss.username == login.username && this.$superBoss.password == login.password){
+	  	this.uniId = true
+	  }else{
+	  	this.uniId = false
+	  }
     },
     methods: {
       init(v) {
@@ -124,19 +131,16 @@
     height: auto;
 	  margin-top: 20px;
   }
-
   .imglistItem {
     position: relative;
     float: left;
     margin-bottom: 20rpx;
     border-radius: 10rpx;
   }
-
   .column3 {
     width: 100%;
     min-height: 100px;
   }
-
   .column4 {
     width: 25%;
     height: 130rpx;
@@ -155,13 +159,11 @@
     display: block;
     border-radius: 10rpx;
   }
-
   .cancelBtn {
     position: absolute;
     top: -18rpx;
     right: 0;
   }
-
   /* 上传控件 */
   .uploadControl {
     font-size: 50rpx;
@@ -171,7 +173,6 @@
     justify-content: center;
     align-items: center;
   }
-
   /*  上传  str end*/
   .clear {
     clear: both;
