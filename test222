@@ -1,0 +1,12 @@
+const paramsList2 = {
+        curPage: 1,
+        pageSize: 10,
+        viewScope: 'H',
+        signAccountCode: this.selectValue, //  合作伙伴
+        status: [
+          'Pending Review',
+          'Pending Accepting Change',
+          'Review In Progress',
+          'Pending Approval',
+          'Approval In Progress'
+        ] 
