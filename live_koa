@@ -1,0 +1,231 @@
+const Koa = require('koa')
+const app = new Koa()
+const views = require('koa-views')
+const json = require('koa-json')
+const onerror = require('koa-onerror')
+const bodyparser = require('koa-bodyparser')
+const logger = require('koa-logger')
+
+const index = require('./routes/index')
+const users = require('./routes/users')
+
+// 直播服务
+const NodeMediaServer = require('node-media-server');
+
+// const config = {
+//   rtmp: {
+//     port: 1935,
+//     chunk_size: 60000,
+//     gop_cache: true,
+//     ping: 30,
+//     ping_timeout: 60
+//   },
+//   http: {
+//     port: 8000,
+//     mediaroot: './media',
+//     allow_origin: '*'
+//   },
+//   trans: {
+//     ffmpeg: './ffmpeg/bin/ffmpeg.exe', //".\\ffmpeg\\bin\\ffmpeg.exe", //'C:\\Users\\zWX990233\\Desktop\\ffmpeg\\bin\\ffmpeg.exe', //'/usr/local/bin/ffmpeg', // ffmpeg 播放器所在的路径
+//     tasks: [
+//       {
+//         app: 'video', //直播流的名称
+//         hls: true,
+//         hlsFlags: '[hls_time=2:hls_list_size=3:hls_flags=delete_segments]',
+//         mp4: true,
+//         // ac:'aac',
+//         // mp4: true,
+//         // mp4Flags: "[movflags=faststart]" //'[movflags=frag_keyframe+empty_moov]'  //
+//       }
+//     ]
+//   },
+
+// };
+
+// const config = {
+//   rtmp: {
+//     port: 1935,
+//     chunk_size: 60000,
+//     gop_cache: true,
+//     ping: 30,
+//     ping_timeout: 60
+//   },
+//   http: {
+//     port: 8000,
+//     allow_origin: '*'
+//   }
+// };
+
+const config = {
+  rtmp: {
+    port: 1935,
+    chunk_size: 60000,
+    gop_cache: true,
+    ping: 30,
+    ping_timeout: 60,
+  },
+  http: {
+    port: 8000,
+    mediaroot: './media',
+    // webroot: './www',
+    allow_origin: '*',
+    // api: true
+  },
+  // auth: {
+  //   api: true,
+  //   api_user: 'admin',
+  //   api_pass: 'admin',
+  //   play: false,
+  //   publish: false,
+  //   secret: 'nodemedia2017privatekey'
+  // },
+  trans: {
+    ffmpeg: './ffmpeg/bin/ffmpeg.exe',
+    tasks: [
+      {
+        app: 'live',
+        mp4: true,
+        mp4Flags: "[movflags=faststart]",
+        // hls: true,
+        // ac: "aac",
+        // acParam: ["-b:a", "128k", "-ar", 48000],
+        // vcParam: [
+        //   "-c:v",
+        //   "libx264",
+        //   "-vf",
+        //   "scale=1280:-1",
+        //   "-b:v",
+        //   "2800k",
+        //   "-bufsize",
+        //   "4200k",
+        //   "-preset",
+        //   "fast",
+        // ],
+
+        // app: 'live',
+        // vc: "copy",
+        // ac: "copy",
+        // hls: true,
+        // hlsFlags: '[hls_time=2:hls_flags=delete_segments]',
+        // mp4: true,
+        // mp4Flags: '[movflags=frag_keyframe+empty_moov]',
+      }
+    ]
+  },
+  // fission: {
+  //   ffmpeg: './ffmpeg/bin/ffmpeg.exe',
+  //   tasks: [
+  //     {
+  //       rule: "live/",
+  //       model: [
+  //         {
+  //           ab: "192k",
+  //           vb: "2500k",
+  //           vs: "1920x1080",
+  //           vf: "60",
+  //         },
+  //         {
+  //           ab: "128k",
+  //           vb: "1500k",
+  //           vs: "1280x720",
+  //           vf: "30",
+  //         },
+  //         {
+  //           ab: "96k",
+  //           vb: "1000k",
+  //           vs: "854x480",
+  //           vf: "24",
+  //         },
+  //         {
+  //           ab: "96k",
+  //           vb: "600k",
+  //           vs: "640x360",
+  //           vf: "20",
+  //         },
+  //       ]
+  //     }
+  //   ]
+  // }
+};
+
+var nms = new NodeMediaServer(config)
+nms.run();
+
+// nms.on('preConnect', (id, args) => {
+
+//   console.log(1, '[NodeEvent on preConnect]', `id=${id} args=${JSON.stringify(args)}`);
+//   // let session = nms.getSession(id);
+//   // session.reject();
+// });
+
+// nms.on('postConnect', (id, args) => {
+//   console.log(2, '[NodeEvent on postConnect]', `id=${id} args=${JSON.stringify(args)}`);
+// });
+
+// nms.on('doneConnect', (id, args) => {
+//   console.log(3, '[NodeEvent on doneConnect]', `id=${id} args=${JSON.stringify(args)}`);
+// });
+
+// nms.on('prePublish', (id, StreamPath, args) => {
+//   console.log(4, '[NodeEvent on prePublish]', `id=${id} StreamPath=${StreamPath} args=${JSON.stringify(args)}`);
+//   // let session = nms.getSession(id);
+//   // session.reject();
+// });
+
+// nms.on('postPublish', (id, StreamPath, args) => {
+//   console.log(5, '[NodeEvent on postPublish]', `id=${id} StreamPath=${StreamPath} args=${JSON.stringify(args)}`);
+// });
+
+// nms.on('donePublish', (id, StreamPath, args) => {
+//   console.log(6, '[NodeEvent on donePublish]', `id=${id} StreamPath=${StreamPath} args=${JSON.stringify(args)}`);
+// });
+
+// nms.on('prePlay', (id, StreamPath, args) => {
+//   console.log(7, '[NodeEvent on prePlay]', `id=${id} StreamPath=${StreamPath} args=${JSON.stringify(args)}`);
+//   // let session = nms.getSession(id);
+//   // session.reject();
+// });
+
+// nms.on('postPlay', (id, StreamPath, args) => {
+//   console.log(8, '[NodeEvent on postPlay]', `id=${id} StreamPath=${StreamPath} args=${JSON.stringify(args)}`);
+// });
+
+// nms.on('donePlay', (id, StreamPath, args) => {
+//   console.log(9, '[NodeEvent on donePlay]', `id=${id} StreamPath=${StreamPath} args=${JSON.stringify(args)}`);
+// });
+
+
+
+// error handler
+onerror(app)
+
+// middlewares
+app.use(bodyparser({
+  enableTypes: ['json', 'form', 'text']
+}))
+app.use(json())
+app.use(logger())
+app.use(require('koa-static')(__dirname + '/public'))
+
+app.use(views(__dirname + '/views', {
+  extension: 'pug'
+}))
+
+// logger
+app.use(async (ctx, next) => {
+  const start = new Date()
+  await next()
+  const ms = new Date() - start
+  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+})
+
+// routes
+app.use(index.routes(), index.allowedMethods())
+app.use(users.routes(), users.allowedMethods())
+
+// error-handling
+app.on('error', (err, ctx) => {
+  console.error('server error', err, ctx)
+});
+
+module.exports = app
